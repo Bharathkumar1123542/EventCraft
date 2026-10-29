@@ -23,7 +23,7 @@ describe('Environment validation', () => {
   };
 
   it('should accept valid environment', () => {
-    process.env = { ...validEnv };
+    process.env = { ...validEnv } as NodeJS.ProcessEnv;
     
     // Dynamically import to get fresh env validation
     const schema = z.object({
@@ -46,7 +46,7 @@ describe('Environment validation', () => {
   });
 
   it('should require BETTER_AUTH_SECRET with min 32 characters', () => {
-    process.env = { ...validEnv, BETTER_AUTH_SECRET: 'too-short' };
+    process.env = { ...validEnv, BETTER_AUTH_SECRET: 'too-short' } as NodeJS.ProcessEnv;
 
     const schema = z.object({
       BETTER_AUTH_SECRET: z.string().min(32),
@@ -57,7 +57,7 @@ describe('Environment validation', () => {
 
   it('should require both Google OAuth variables or neither', () => {
     // Only client ID
-    process.env = { ...validEnv, GOOGLE_CLIENT_ID: 'client-id' };
+    process.env = { ...validEnv, GOOGLE_CLIENT_ID: 'client-id' } as NodeJS.ProcessEnv;
 
     const schema = z
       .object({
@@ -83,7 +83,7 @@ describe('Environment validation', () => {
       ...validEnv,
       GOOGLE_CLIENT_ID: 'client-id',
       GOOGLE_CLIENT_SECRET: 'client-secret',
-    };
+    } as NodeJS.ProcessEnv;
 
     expect(() => schema.parse(process.env)).not.toThrow();
   });
@@ -111,7 +111,7 @@ describe('Environment validation', () => {
   });
 
   it('should reject fake provider in production', () => {
-    process.env = { ...validEnv, NODE_ENV: 'production', LLM_PROVIDER: 'fake' };
+    process.env = { ...validEnv, NODE_ENV: 'production', LLM_PROVIDER: 'fake' } as NodeJS.ProcessEnv;
 
     const schema = z
       .object({
@@ -132,7 +132,7 @@ describe('Environment validation', () => {
   });
 
   it('should use default values', () => {
-    process.env = { ...validEnv };
+    process.env = { ...validEnv } as NodeJS.ProcessEnv;
 
     const schema = z.object({
       NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -146,7 +146,7 @@ describe('Environment validation', () => {
   });
 
   it('should validate TRUST_PROXY_HOPS range', () => {
-    process.env = { ...validEnv, TRUST_PROXY_HOPS: '10' };
+    process.env = { ...validEnv, TRUST_PROXY_HOPS: '10' } as NodeJS.ProcessEnv;
 
     const schema = z.object({
       TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5),
@@ -154,12 +154,12 @@ describe('Environment validation', () => {
 
     expect(() => schema.parse(process.env)).toThrow();
 
-    process.env = { ...validEnv, TRUST_PROXY_HOPS: '3' };
+    process.env = { ...validEnv, TRUST_PROXY_HOPS: '3' } as NodeJS.ProcessEnv;
     expect(() => schema.parse(process.env)).not.toThrow();
   });
 
   it('should validate LOG_LEVEL enum', () => {
-    process.env = { ...validEnv, LOG_LEVEL: 'invalid' };
+    process.env = { ...validEnv, LOG_LEVEL: 'invalid' } as NodeJS.ProcessEnv;
 
     const schema = z.object({
       LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']),
@@ -167,7 +167,7 @@ describe('Environment validation', () => {
 
     expect(() => schema.parse(process.env)).toThrow();
 
-    process.env = { ...validEnv, LOG_LEVEL: 'debug' };
+    process.env = { ...validEnv, LOG_LEVEL: 'debug' } as NodeJS.ProcessEnv;
     expect(() => schema.parse(process.env)).not.toThrow();
   });
 });

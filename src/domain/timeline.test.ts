@@ -350,7 +350,7 @@ describe('timeline', () => {
             fc.record({
               title: fc.string({ minLength: 1 }),
               description: fc.string(),
-              categoryKey: fc.constantFrom('venue', null),
+              categoryKey: fc.constantFrom('venue', null) as fc.Arbitrary<CategoryKey | null>,
               idealDaysBefore: fc.integer({ min: 0, max: 100 }),
               priority: fc.constantFrom('low', 'medium', 'high'),
             }),
@@ -373,7 +373,7 @@ describe('timeline', () => {
             fc.record({
               title: fc.string({ minLength: 1 }),
               description: fc.string(),
-              categoryKey: fc.constantFrom('venue', null),
+              categoryKey: fc.constantFrom('venue', null) as fc.Arbitrary<CategoryKey | null>,
               idealDaysBefore: fc.integer({ min: 0, max: 200 }),
               priority: fc.constantFrom('low', 'medium', 'high'),
             }),
