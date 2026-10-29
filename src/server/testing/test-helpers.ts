@@ -18,9 +18,12 @@ export interface TestUser {
 export interface TestEvent {
   id: string;
   ownerId: string;
+  type: string;
   title: string;
-  eventType: string;
-  eventDate: Date;
+  eventDate: string;
+  timezone: string;
+  city: string;
+  guestCount: number;
   currency: string;
   totalBudgetMinor: number;
 }
@@ -76,7 +79,10 @@ export async function createTestEvent(
 
   await db.insert(events).values(event);
 
-  return event as TestEvent;
+  return {
+    ...event,
+    ...overrides,
+  } as TestEvent;
 }
 
 /**

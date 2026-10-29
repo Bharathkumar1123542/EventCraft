@@ -144,7 +144,7 @@ export default function VendorsPage() {
     setContactInfo(vendor.contactInfo || '');
     
     if (vendor.quoteAmountMinor !== null && eventData?.event) {
-      const decimals = CURRENCY_DECIMALS[eventData.event.currency];
+      const decimals = CURRENCY_DECIMALS[eventData.event.currency] ?? 2;
       const major = vendor.quoteAmountMinor / Math.pow(10, decimals);
       setQuoteAmount(String(major));
     } else {
@@ -176,7 +176,7 @@ export default function VendorsPage() {
     };
 
     if (quoteAmount) {
-      const decimals = CURRENCY_DECIMALS[eventData.event.currency];
+      const decimals = CURRENCY_DECIMALS[eventData.event.currency] ?? 2;
       updates.quoteAmountMinor = Math.round(parseFloat(quoteAmount) * Math.pow(10, decimals));
     } else {
       updates.quoteAmountMinor = null;
@@ -244,7 +244,7 @@ export default function VendorsPage() {
         items: [],
       };
     }
-    acc[vendor.categoryKey].items.push(vendor);
+    acc[vendor.categoryKey]!.items.push(vendor);
     return acc;
   }, {} as Record<string, { label: string; items: VendorItem[] }>);
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fc } from 'fast-check';
+import fc from 'fast-check';
 import {
   CURRENCIES,
   MAX_MINOR,

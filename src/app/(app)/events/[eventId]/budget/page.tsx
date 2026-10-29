@@ -180,7 +180,7 @@ export default function BudgetPage() {
 
   const handleEditAllocation = (category: BudgetCategory) => {
     setEditingCategory(category.id);
-    const decimals = CURRENCY_DECIMALS[eventData?.event.currency || 'USD'];
+    const decimals = CURRENCY_DECIMALS[eventData?.event.currency || 'USD'] ?? 2;
     const major = category.allocatedMinor / Math.pow(10, decimals);
     setEditAmount(String(major));
   };
@@ -188,7 +188,7 @@ export default function BudgetPage() {
   const handleSaveAllocation = (categoryId: string) => {
     if (!eventData?.event) return;
     
-    const decimals = CURRENCY_DECIMALS[eventData.event.currency];
+    const decimals = CURRENCY_DECIMALS[eventData.event.currency] ?? 2;
     const amount = Math.round(parseFloat(editAmount) * Math.pow(10, decimals));
     
     updateAllocationMutation.mutate({ categoryId, amount });
