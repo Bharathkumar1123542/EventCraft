@@ -17,6 +17,19 @@ export interface SectionState {
   error?: string;
 }
 
+interface SectionStartedData {
+  section: SectionType;
+}
+
+interface SectionCompletedData {
+  section: SectionType;
+}
+
+interface SectionFailedData {
+  section: SectionType;
+  error?: string;
+}
+
 export interface GenerationState {
   isGenerating: boolean;
   sections: Record<SectionType, SectionState>;
@@ -51,36 +64,45 @@ export function GenerationProvider({ children }: { children: React.ReactNode }) 
 
     switch (message.event) {
       case 'section.started':
-        setState((prev) => ({
-          ...prev,
-          sections: {
-            ...prev.sections,
-            [message.data.section]: { status: 'generating' },
-          },
-        }));
+        {
+          const data = message.data as SectionStartedData;
+          setState((prev) => ({
+            ...prev,
+            sections: {
+              ...prev.sections,
+              [data.section]: { status: 'generating' },
+            },
+          }));
+        }
         break;
 
       case 'section.completed':
-        setState((prev) => ({
-          ...prev,
-          sections: {
-            ...prev.sections,
-            [message.data.section]: { status: 'completed' },
-          },
-        }));
+        {
+          const data = message.data as SectionCompletedData;
+          setState((prev) => ({
+            ...prev,
+            sections: {
+              ...prev.sections,
+              [data.section]: { status: 'completed' },
+            },
+          }));
+        }
         break;
 
       case 'section.failed':
-        setState((prev) => ({
-          ...prev,
-          sections: {
-            ...prev.sections,
-            [message.data.section]: {
-              status: 'failed',
-              error: message.data.error || 'Generation failed',
+        {
+          const data = message.data as SectionFailedData;
+          setState((prev) => ({
+            ...prev,
+            sections: {
+              ...prev.sections,
+              [data.section]: {
+                status: 'failed',
+                error: data.error || 'Generation failed',
+              },
             },
-          },
-        }));
+          }));
+        }
         break;
 
       case 'run.completed':

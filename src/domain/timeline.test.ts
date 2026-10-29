@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { scheduleTasks } from './timeline';
 import type { TaskDraft, ScheduleContext } from './timeline';
-import type { IsoDate } from './types';
+import type { IsoDate, CategoryKey } from './types';
 import { addDays, daysBetween } from './dates';
 
 describe('timeline', () => {
@@ -316,7 +316,7 @@ describe('timeline', () => {
             fc.record({
               title: fc.string({ minLength: 1, maxLength: 20 }),
               description: fc.string({ maxLength: 50 }),
-              categoryKey: fc.constantFrom('venue', 'catering', null),
+              categoryKey: fc.constantFrom('venue', 'catering', null) as fc.Arbitrary<CategoryKey | null>,
               idealDaysBefore: fc.integer({ min: 0, max: 365 }),
               priority: fc.constantFrom('low', 'medium', 'high'),
             }),
