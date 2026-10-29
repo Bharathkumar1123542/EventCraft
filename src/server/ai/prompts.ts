@@ -12,7 +12,7 @@ export function buildInitialPlanPrompt(input: {
   guestCount: number;
   city: string | null;
   totalBudgetMinor: number;
-  currency: Currency;
+  currency: CurrencyCode;
   userPrompt: string;
 }): string {
   const budgetFormatted = (input.totalBudgetMinor / 100).toFixed(2);
@@ -41,7 +41,7 @@ export function buildBudgetSuggestionPrompt(input: {
   type: EventType;
   guestCount: number;
   totalBudgetMinor: number;
-  currency: Currency;
+  currency: CurrencyCode;
   currentCategories: Array<{ categoryKey: string; allocatedMinor: number }>;
 }): string {
   const budgetFormatted = (input.totalBudgetMinor / 100).toFixed(2);

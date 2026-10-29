@@ -9,12 +9,12 @@ import { env } from '../config/env';
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogContext {
-  method?: string;
-  path?: string;
-  status?: number;
-  durationMs?: number;
-  userId?: string;
-  error?: Error;
+  method?: string | undefined;
+  path?: string | undefined;
+  status?: number | undefined;
+  durationMs?: number | undefined;
+  userId?: string | undefined;
+  error?: Error | undefined;
   [key: string]: unknown;
 }
 
@@ -70,13 +70,16 @@ export function logRequest(
  * Log error
  */
 export function logError(message: string, error: Error, context?: LogContext) {
+  const errorObj: Record<string, unknown> = {
+    name: error.name,
+    message: error.message,
+  };
+  if (error.stack !== undefined) {
+    errorObj.stack = error.stack;
+  }
   log('error', message, {
     ...context,
-    error: {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    },
+    error: errorObj as Error,
   });
 }
 

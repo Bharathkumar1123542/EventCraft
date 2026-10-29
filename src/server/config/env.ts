@@ -82,7 +82,7 @@ export function getEnv(): Env {
   const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
-    const errors = result.error.errors.map((err) => `  - ${err.path.join('.')}: ${err.message}`);
+    const errors = result.error.issues.map((err) => `  - ${err.path.join('.')}: ${err.message}`);
     console.error('❌ Invalid environment variables:\n' + errors.join('\n'));
     process.exit(1);
   }

@@ -3,100 +3,76 @@
 ## Summary
 
 **Initial State:** 187 type errors  
-**Current State:** 106 type errors  
-**Fixed:** 81 errors (43% reduction)  
-**Status:** In Progress
+**Current State:** 76 type errors  
+**Fixed:** 111 errors (59% reduction)  
+**Status:** In Progress - Good momentum!
 
-## Commits Made
+## Commits Made (9 total)
 
 1. **fix(types): resolve 43 of 187 TypeScript compilation errors**
-   - Component prop types (Input, Textarea, MoneyField)
-   - E2E test date handling
-   - Config files (Playwright, Vitest)
-   - Test helpers schema fixes
+   - Component prop types, E2E tests, config files, test helpers
 
 2. **fix(types): resolve env exports, fast-check imports, and test helpers**
-   - Added env singleton export
-   - Fixed Currency → CurrencyCode
-   - Fixed fast-check imports
-   - Fixed test helper schemas
+   - env singleton, Currency→CurrencyCode, fast-check fixes
 
 3. **fix(types): fix fast-check default import and decimal handling**
-   - Changed to default import
-   - Added decimal fallbacks
-   - Fixed TestEvent interface
+   - Default import pattern, decimal fallbacks
 
 4. **fix(types): add | undefined to all repository Update input interfaces**
    - UpdateEventInput, UpdateExpenseInput, UpdateTaskInput, UpdateVendorInput
-   - Required for exactOptionalPropertyTypes compliance
 
-## Remaining Issues (106 errors)
+5. **fix(types): add CategoryKey type casts for schema validation**
+   - Cast from Zod-inferred literals to CategoryKey in routes
+   - Fix userId scope in budget categories catch block
 
-### By Category
+6. **fix(types): add | undefined to Create input interfaces and IsoDate casts**
+   - CreateExpenseInput, CreateTaskInput, CreateVendorInput notes optional
+   - IsoDate casts in export routes
+   - Fix toast state setter
 
-1. **CategoryKey Type Mismatches** (~20-30 errors)
-   - Schema validation returns string literals not matching CategoryKey union
-   - Affects: budget routes, expense routes, task routes, vendor routes, generation service
-   - Root cause: Zod schemas infer narrower types than domain CategoryKey
+7. **fix(types): fix timeline test CategoryKey and generation-provider SSE types**
+   - fast-check arbitrary CategoryKey casts
+   - SSE message data type interfaces
 
-2. **IsoDate Branding Issues** (~5 errors)
-   - Plain strings being used where IsoDate brand expected
-   - Affects: ICS export, markdown export
-   - Need type assertions or brand casting functions
+8. **fix(types): fix ProblemDetail interface and ZodError issues property**
+   - Add | undefined to ProblemDetail optional fields
+   - Change error.errors to error.issues (correct Zod API)
 
-3. **IDOR Protection Tests** (~49 errors)
-   - Large integration test file with systematic type issues
-   - Many test helper calls with wrong signatures
+9. **fix(types): cast process.env assignments and timeline test CategoryKey**
+   - NodeJS.ProcessEnv casts in env.test.ts
+   - Remaining CategoryKey arbitrary fixes
 
-4. **Misc Issues** (~32 errors)
-   - Toast state setter type
-   - Process.env assignments in tests
-   - Missing userId variable
-   - Generation provider SSE message typing
-   - AI generate input_schema type
-   - Fast-check property test parameter types
+## Remaining Issues (76 errors)
+
+### By File (sorted by error count)
+
+1. **idor-protection.integration.test.ts**: 49 errors - Complex test helper signatures
+2. **timeline.test.ts**: 3 errors
+3. **budget.repository.ts**: 2 errors
+4. **events.schema.ts**: 2 errors
+5. **vendors.repository.ts**: 2 errors
+6. **tasks.repository.ts**: 2 errors
+7. **logger.ts**: 2 errors
+8. **events.repository.ts**: 2 errors
+9. **generation.service.ts**: 2 errors
+10. **env.ts**: 2 errors
+11. **prompts.ts**: 2 errors
+12. Single errors in: generation.schema, test-helpers, toast.tsx, tasks/[taskId]/route, export/markdown/route, generate.ts
 
 ## Next Steps
 
-### Immediate (High Impact)
+1. Fix 2-error files (quick wins) - ~24 errors
+2. Fix 3-error timeline.test - ~3 errors
+3. Tackle IDOR test file last - 49 errors (most complex)
 
-1. **Fix CategoryKey mismatches** - Create type guard or widen Zod schema
-2. **Fix IsoDate branding** - Add casting functions in domain/types
-3. **Fix generation provider** - Type SSE message data properly
+## Patterns Established
 
-### Then
+- Optional props: add `| undefined` for exactOptionalPropertyTypes
+- CategoryKey: cast with `as CategoryKey` at validation boundary
+- IsoDate: cast with `as IsoDate` where DB/validation guarantees format
+- fast-check: default import + type casts for arbitraries
+- Zod: use `.issues` not `.errors`
+- process.env: cast to `NodeJS.ProcessEnv`
+- SSE messages: define data interfaces and type assert
+- Toast: conditionally add optional fields vs spreading undefined
 
-4. **Fix IDOR tests** - Update test helper calls systematically
-5. **Fix remaining misc issues** - Toast, env tests, etc.
-
-## Strategy Decision Needed
-
-The remaining errors are more complex and touch core type design decisions:
-
-**Option A: Continue strict fixes** (~4-6 hours more)
-- Maintain exact Optional PropertyTypes
-- Add proper brand casting
-- Fix all CategoryKey mismatches
-- Most correct but time-intensive
-
-**Option B: Pragmatic relaxation** (~1 hour)
-- Disable exactOptionalPropertyTypes temporarily
-- Add TODO comments for brand issues
-- Get to compiling state faster
-- Can address systematically later
-
-**Current Recommendation:** Continue with Option A since we've made good progress (43% done) and the patterns are becoming clearer.
-
-## Files Modified So Far
-
-- 3 component files (Input, Textarea, MoneyField)
-- 5 E2E test files
-- 2 config files (playwright, vitest)
-- 1 test helpers file
-- 3 domain test files
-- 1 scripts file
-- 2 page files (budget, vendors)
-- 4 repository files
-- 2 config files (env, prompts)
-
-Total: 23 files modified across 4 commits
