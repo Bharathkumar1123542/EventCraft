@@ -12,6 +12,7 @@ import { setCategoriesSchema } from '@/server/schemas/budget.schema';
 import { parseBody, requireJsonContentType, checkBodySize } from '@/server/http/validation';
 import { unauthorized, notFound, badRequest } from '@/server/http/problem';
 import { logRequest, logError } from '@/server/http/logger';
+import type { CategoryKey } from '@/domain/types';
 
 const MAX_BODY_SIZE = 10_000; // 10KB
 
@@ -21,9 +22,10 @@ export async function PUT(
 ) {
   const start = Date.now();
   const { eventId } = await params;
+  let userId: string | undefined;
 
   try {
-    const userId = await requireAuth();
+    userId = await requireAuth();
 
     if (!requireJsonContentType(request)) {
       return badRequest('Content-Type must be application/json');
@@ -43,7 +45,10 @@ export async function PUT(
     const categories = await repo.setCategories({
       eventId,
       ownerId: userId,
-      categories: result.data.categories,
+      categories: result.data.categories as Array<{
+        categoryKey: CategoryKey;
+        allocatedMinor: number;
+      }>,
     });
 
     if (!categories) {

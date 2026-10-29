@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/server/auth/session';
 import { db } from '@/server/db/client';
 import { VendorsRepository } from '@/server/db/repositories';
+import type { CategoryKey } from '@/domain/types';
 import { createVendorSchema } from '@/server/schemas/vendors.schema';
 import { parseBody, requireJsonContentType, checkBodySize } from '@/server/http/validation';
 import { unauthorized, notFound, badRequest, tooManyRequests } from '@/server/http/problem';
@@ -66,7 +67,7 @@ export async function POST(
     const vendor = await repo.create({
       eventId,
       ownerId: userId,
-      categoryKey: sanitized.categoryKey,
+      categoryKey: sanitized.categoryKey as CategoryKey,
       need: sanitized.need,
       questions: sanitized.questions,
       isMustHave: sanitized.isMustHave,

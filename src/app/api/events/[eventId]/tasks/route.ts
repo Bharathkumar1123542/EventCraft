@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/server/auth/session';
 import { db } from '@/server/db/client';
 import { TasksRepository } from '@/server/db/repositories';
+import type { CategoryKey } from '@/domain/types';
 import { createTaskSchema } from '@/server/schemas/tasks.schema';
 import { parseBody, requireJsonContentType, checkBodySize } from '@/server/http/validation';
 import { unauthorized, notFound, badRequest, tooManyRequests } from '@/server/http/problem';
@@ -66,7 +67,7 @@ export async function POST(
       eventId,
       ownerId: userId,
       title: sanitized.title,
-      categoryKey: sanitized.categoryKey,
+      categoryKey: sanitized.categoryKey as CategoryKey | null,
       dueDate: sanitized.dueDate,
       priority: sanitized.priority,
       notes: sanitized.notes,

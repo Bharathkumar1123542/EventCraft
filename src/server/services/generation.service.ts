@@ -5,6 +5,7 @@ import 'server-only';
  */
 
 import type { Database } from '../db/client';
+import type { CategoryKey } from '@/domain/types';
 import {
   EventsRepository,
   BudgetRepository,
@@ -94,7 +95,7 @@ export class GenerationService {
         eventId: event.id,
         ownerId: input.userId,
         title: task.title,
-        categoryKey: task.categoryKey,
+        categoryKey: task.categoryKey as CategoryKey | null,
         dueDate: task.dueDate,
         priority: task.priority,
       });
@@ -106,7 +107,7 @@ export class GenerationService {
       await vendorsRepo.create({
         eventId: event.id,
         ownerId: input.userId,
-        categoryKey: vendor.categoryKey,
+        categoryKey: vendor.categoryKey as CategoryKey,
         need: vendor.need,
         questions: vendor.questions,
         isMustHave: vendor.isMustHave,

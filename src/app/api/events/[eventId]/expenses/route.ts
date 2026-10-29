@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/server/auth/session';
 import { db } from '@/server/db/client';
 import { BudgetRepository } from '@/server/db/repositories';
+import type { CategoryKey } from '@/domain/types';
 import { createExpenseSchema } from '@/server/schemas/budget.schema';
 import { parseBody, requireJsonContentType, checkBodySize } from '@/server/http/validation';
 import { unauthorized, notFound, badRequest, tooManyRequests } from '@/server/http/problem';
@@ -65,7 +66,7 @@ export async function POST(
     const expense = await repo.createExpense({
       eventId,
       ownerId: userId,
-      categoryKey: sanitized.categoryKey,
+      categoryKey: sanitized.categoryKey as CategoryKey,
       label: sanitized.label,
       amountMinor: sanitized.amountMinor,
       status: sanitized.status,
