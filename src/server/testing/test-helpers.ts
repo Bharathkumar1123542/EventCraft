@@ -79,7 +79,7 @@ export async function createTestEvent(
   const event = { ...baseEvent, ...overrides };
 
   // Build insert payload, excluding undefined optional fields
-  const insertPayload: Record<string, unknown> = {};
+  const insertPayload: any = {};
   for (const [key, value] of Object.entries(event)) {
     if (value !== undefined) {
       insertPayload[key] = value;
