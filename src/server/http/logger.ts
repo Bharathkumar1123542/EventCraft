@@ -79,7 +79,7 @@ export function logError(message: string, error: Error, context?: LogContext) {
   }
   log('error', message, {
     ...context,
-    error: errorObj as Error,
+    error: errorObj as unknown as Error,
   });
 }
 

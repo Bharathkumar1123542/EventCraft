@@ -15,7 +15,7 @@ export const generateInitialPlanSchema = z.object({
   currency: z.enum(['USD', 'EUR', 'GBP', 'INR', 'CAD', 'AUD', 'JPY']),
   totalBudgetMinor: z.number().int().min(0),
   userPrompt: z.string().min(10).max(2000),
-  preferences: z.record(z.unknown()).optional(),
+  preferences: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type GenerateInitialPlanInput = z.infer<typeof generateInitialPlanSchema>;

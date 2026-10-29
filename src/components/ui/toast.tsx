@@ -134,15 +134,15 @@ export {
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 
 // Toast hook
+type ToastMessage = {
+  id: string;
+  title: string;
+  description?: string;
+  variant?: 'default' | 'success' | 'error';
+};
+
 export function useToast() {
-  const [toasts, setToasts] = React.useState<
-    Array<{
-      id: string;
-      title: string;
-      description?: string;
-      variant?: 'default' | 'success' | 'error';
-    }>
-  >([]);
+  const [toasts, setToasts] = React.useState<ToastMessage[]>([]);
 
   const toast = React.useCallback(
     ({
@@ -155,7 +155,7 @@ export function useToast() {
       variant?: 'default' | 'success' | 'error';
     }) => {
       const id = Math.random().toString(36).slice(2);
-      const newToast: Toast = { id, title, variant };
+      const newToast: ToastMessage = { id, title, variant };
       if (description !== undefined) {
         newToast.description = description;
       }

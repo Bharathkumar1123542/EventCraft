@@ -62,7 +62,7 @@ export async function createTestEvent(
   eventDate.setDate(eventDate.getDate() + 30); // 30 days from now
   const eventDateString = eventDate.toISOString().split('T')[0]!;
 
-  const event = {
+  const baseEvent = {
     id: eventId,
     ownerId,
     type: 'wedding' as const,
@@ -74,10 +74,19 @@ export async function createTestEvent(
     currency: 'USD' as const,
     totalBudgetMinor: 5000000, // $50,000
     preferences: {},
-    ...overrides,
   };
 
-  await db.insert(events).values(event);
+  const event = { ...baseEvent, ...overrides };
+
+  // Build insert payload, excluding undefined optional fields
+  const insertPayload: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(event)) {
+    if (value !== undefined) {
+      insertPayload[key] = value;
+    }
+  }
+
+  await db.insert(events).values(insertPayload);
 
   return {
     ...event,
