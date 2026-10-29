@@ -21,11 +21,11 @@ export interface CreateVendorInput {
 }
 
 export interface UpdateVendorInput {
-  need?: string;
-  questions?: readonly string[];
-  status?: 'not_started' | 'contacted' | 'quoted' | 'booked' | 'declined';
-  isMustHave?: boolean;
-  notes?: string;
+  need?: string | undefined;
+  questions?: readonly string[] | undefined;
+  status?: 'not_started' | 'contacted' | 'quoted' | 'booked' | 'declined' | undefined;
+  isMustHave?: boolean | undefined;
+  notes?: string | undefined;
 }
 
 export class VendorsRepository {

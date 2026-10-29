@@ -21,12 +21,12 @@ export interface CreateTaskInput {
 }
 
 export interface UpdateTaskInput {
-  title?: string;
-  categoryKey?: CategoryKey | null;
-  dueDate?: string;
-  priority?: Priority;
-  status?: 'todo' | 'in_progress' | 'done';
-  notes?: string;
+  title?: string | undefined;
+  categoryKey?: CategoryKey | null | undefined;
+  dueDate?: string | undefined;
+  priority?: Priority | undefined;
+  status?: 'todo' | 'in_progress' | 'done' | undefined;
+  notes?: string | undefined;
 }
 
 export class TasksRepository {

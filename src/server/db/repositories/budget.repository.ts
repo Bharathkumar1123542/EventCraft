@@ -30,10 +30,10 @@ export interface CreateExpenseInput {
 }
 
 export interface UpdateExpenseInput {
-  label?: string;
-  amountMinor?: number;
-  status?: 'committed' | 'paid';
-  notes?: string;
+  label?: string | undefined;
+  amountMinor?: number | undefined;
+  status?: 'committed' | 'paid' | undefined;
+  notes?: string | undefined;
 }
 
 export class BudgetRepository {

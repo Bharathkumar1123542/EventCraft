@@ -8,7 +8,7 @@ import 'server-only';
 import { eq, and, desc } from 'drizzle-orm';
 import type { Database } from '../client';
 import { events } from '../schema';
-import type { EventType, Currency } from '@/domain/types';
+import type { EventType, CurrencyCode } from '@/domain/types';
 
 export interface CreateEventInput {
   ownerId: string;
@@ -18,18 +18,18 @@ export interface CreateEventInput {
   timezone: string;
   city: string | null;
   guestCount: number;
-  currency: Currency;
+  currency: CurrencyCode;
   totalBudgetMinor: number;
   preferences: Record<string, unknown>;
 }
 
 export interface UpdateEventInput {
-  title?: string;
-  eventDate?: string;
-  timezone?: string;
-  city?: string | null;
-  guestCount?: number;
-  preferences?: Record<string, unknown>;
+  title?: string | undefined;
+  eventDate?: string | undefined;
+  timezone?: string | undefined;
+  city?: string | null | undefined;
+  guestCount?: number | undefined;
+  preferences?: Record<string, unknown> | undefined;
 }
 
 export class EventsRepository {
