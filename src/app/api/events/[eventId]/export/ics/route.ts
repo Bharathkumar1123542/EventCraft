@@ -10,6 +10,7 @@ import { TasksRepository } from '@/server/db/repositories';
 import { buildIcs } from '@/domain/ics';
 import { unauthorized, notFound } from '@/server/http/problem';
 import { logRequest, logError } from '@/server/http/logger';
+import type { IsoDate } from '@/domain/types';
 
 export async function GET(
   request: NextRequest,
@@ -35,7 +36,7 @@ export async function GET(
     const events = tasks.map((task) => ({
       uid: `task-${task.id}`,
       summary: task.title,
-      date: task.dueDate,
+      date: task.dueDate as IsoDate,
     }));
 
     const ics = buildIcs(events, new Date());

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/server/auth/session';
 import { db } from '@/server/db/client';
+import type { IsoDate } from '@/domain/types';
 import {
   EventsRepository,
   BudgetRepository,
@@ -58,7 +59,7 @@ export async function GET(
       {
         type: event.type,
         title: event.title,
-        eventDate: event.eventDate,
+        eventDate: event.eventDate as IsoDate,
         guestCount: event.guestCount,
         city: event.city,
       },

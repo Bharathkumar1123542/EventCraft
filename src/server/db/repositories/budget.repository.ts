@@ -26,7 +26,7 @@ export interface CreateExpenseInput {
   label: string;
   amountMinor: number;
   status: 'committed' | 'paid';
-  notes?: string;
+  notes?: string | undefined;
 }
 
 export interface UpdateExpenseInput {

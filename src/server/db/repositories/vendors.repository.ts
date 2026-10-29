@@ -17,7 +17,7 @@ export interface CreateVendorInput {
   need: string;
   questions: readonly string[];
   isMustHave: boolean;
-  notes?: string;
+  notes?: string | undefined;
 }
 
 export interface UpdateVendorInput {

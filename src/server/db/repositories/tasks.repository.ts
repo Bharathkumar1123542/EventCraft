@@ -17,7 +17,7 @@ export interface CreateTaskInput {
   categoryKey: CategoryKey | null;
   dueDate: string; // IsoDate
   priority: Priority;
-  notes?: string;
+  notes?: string | undefined;
 }
 
 export interface UpdateTaskInput {

@@ -155,7 +155,11 @@ export function useToast() {
       variant?: 'default' | 'success' | 'error';
     }) => {
       const id = Math.random().toString(36).slice(2);
-      setToasts((prev) => [...prev, { id, title, description, variant }]);
+      const newToast: Toast = { id, title, variant };
+      if (description !== undefined) {
+        newToast.description = description;
+      }
+      setToasts((prev) => [...prev, newToast]);
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
       }, 6000);
