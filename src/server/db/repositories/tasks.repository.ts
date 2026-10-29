@@ -48,7 +48,7 @@ export class TasksRepository {
         categoryKey: input.categoryKey,
         dueDate: input.dueDate,
         priority: input.priority,
-        notes: input.notes,
+        ...(input.notes !== undefined && { notes: input.notes }),
       })
       .returning();
 
@@ -94,12 +94,19 @@ export class TasksRepository {
    * Owner-scoped: validates event ownership
    */
   async update(taskId: string, ownerId: string, input: UpdateTaskInput) {
+    const updateData: Record<string, unknown> = {
+      updatedAt: new Date(),
+    };
+    if (input.title !== undefined) updateData.title = input.title;
+    if (input.categoryKey !== undefined) updateData.categoryKey = input.categoryKey;
+    if (input.dueDate !== undefined) updateData.dueDate = input.dueDate;
+    if (input.priority !== undefined) updateData.priority = input.priority;
+    if (input.status !== undefined) updateData.status = input.status;
+    if (input.notes !== undefined) updateData.notes = input.notes;
+
     const [updated] = await this.db
       .update(tasks)
-      .set({
-        ...input,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(
         and(
           eq(tasks.id, taskId),

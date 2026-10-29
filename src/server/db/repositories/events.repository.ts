@@ -5,7 +5,7 @@ import 'server-only';
  * Owner-scoped: all queries filter by ownerId
  */
 
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import type { Database } from '../client';
 import { events } from '../schema';
 import type { EventType, CurrencyCode } from '@/domain/types';
@@ -92,13 +92,20 @@ export class EventsRepository {
    * Note: cannot update totalBudgetMinor or currency after creation
    */
   async update(eventId: string, ownerId: string, input: UpdateEventInput) {
+    const updateData: Record<string, unknown> = {
+      updatedAt: new Date(),
+      version: sql`version + 1`,
+    };
+    if (input.title !== undefined) updateData.title = input.title;
+    if (input.eventDate !== undefined) updateData.eventDate = input.eventDate;
+    if (input.timezone !== undefined) updateData.timezone = input.timezone;
+    if (input.city !== undefined) updateData.city = input.city;
+    if (input.guestCount !== undefined) updateData.guestCount = input.guestCount;
+    if (input.preferences !== undefined) updateData.preferences = input.preferences;
+
     const [updated] = await this.db
       .update(events)
-      .set({
-        ...input,
-        updatedAt: new Date(),
-        version: this.db.$sql`version + 1`,
-      })
+      .set(updateData)
       .where(and(eq(events.id, eventId), eq(events.ownerId, ownerId)))
       .returning();
 

@@ -47,7 +47,7 @@ export class VendorsRepository {
         need: input.need,
         questions: input.questions as string[],
         isMustHave: input.isMustHave,
-        notes: input.notes,
+        ...(input.notes !== undefined && { notes: input.notes }),
       })
       .returning();
 
@@ -92,13 +92,18 @@ export class VendorsRepository {
    * Owner-scoped: validates event ownership
    */
   async update(vendorId: string, ownerId: string, input: UpdateVendorInput) {
+    const updateData: Record<string, unknown> = {
+      updatedAt: new Date(),
+    };
+    if (input.need !== undefined) updateData.need = input.need;
+    if (input.questions !== undefined) updateData.questions = input.questions as string[];
+    if (input.status !== undefined) updateData.status = input.status;
+    if (input.isMustHave !== undefined) updateData.isMustHave = input.isMustHave;
+    if (input.notes !== undefined) updateData.notes = input.notes;
+
     const [updated] = await this.db
       .update(vendors)
-      .set({
-        ...input,
-        ...(input.questions && { questions: input.questions as string[] }),
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(
         and(
           eq(vendors.id, vendorId),

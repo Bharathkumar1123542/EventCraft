@@ -102,7 +102,7 @@ export class BudgetRepository {
         label: input.label,
         amountMinor: input.amountMinor,
         status: input.status,
-        notes: input.notes,
+        ...(input.notes !== undefined && { notes: input.notes }),
       })
       .returning();
 
@@ -151,12 +151,17 @@ export class BudgetRepository {
     ownerId: string,
     input: UpdateExpenseInput
   ) {
+    const updateData: Record<string, unknown> = {
+      updatedAt: new Date(),
+    };
+    if (input.label !== undefined) updateData.label = input.label;
+    if (input.amountMinor !== undefined) updateData.amountMinor = input.amountMinor;
+    if (input.status !== undefined) updateData.status = input.status;
+    if (input.notes !== undefined) updateData.notes = input.notes;
+
     const [updated] = await this.db
       .update(expenses)
-      .set({
-        ...input,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(
         and(
           eq(expenses.id, expenseId),
