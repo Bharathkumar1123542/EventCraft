@@ -4,7 +4,7 @@ import 'server-only';
  * Spec: spec.md §7.1
  */
 
-import type { EventType, Currency } from '@/domain/types';
+import type { EventType, CurrencyCode } from '@/domain/types';
 
 export function buildInitialPlanPrompt(input: {
   type: EventType;

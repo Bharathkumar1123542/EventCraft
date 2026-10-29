@@ -15,7 +15,7 @@ describe('ics', () => {
       expect(result).toContain('PRODID:-//EventCraft//EN');
       expect(result).toContain('CALSCALE:GREGORIAN');
       expect(result).toContain('END:VCALENDAR');
-      expect(result).toEndWith('\r\n');
+      expect(result.endsWith('\r\n')).toBe(true);
     });
 
     it('generates VEVENT for each event', () => {

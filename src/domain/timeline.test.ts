@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fc } from '@vitest/utils';
+import { fc } from 'fast-check';
 import { scheduleTasks } from './timeline';
 import type { TaskDraft, ScheduleContext } from './timeline';
 import type { IsoDate } from './types';

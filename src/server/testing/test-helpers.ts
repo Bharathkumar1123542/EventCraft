@@ -57,21 +57,20 @@ export async function createTestEvent(
   const eventId = crypto.randomUUID();
   const eventDate = new Date();
   eventDate.setDate(eventDate.getDate() + 30); // 30 days from now
+  const eventDateString = eventDate.toISOString().split('T')[0]!;
 
   const event = {
     id: eventId,
     ownerId,
     type: 'wedding' as const,
     title: 'Test Event',
-    eventDate,
+    eventDate: eventDateString,
     timezone: 'America/New_York',
     city: 'New York',
     guestCount: 100,
     currency: 'USD' as const,
     totalBudgetMinor: 5000000, // $50,000
     preferences: {},
-    createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides,
   };
 
@@ -152,7 +151,7 @@ export async function createTestVendorItem(eventId: string, overrides: any = {})
     ...overrides,
   };
 
-  await db.insert(vendorItems).values(vendor);
+  await db.insert(vendors).values(vendor);
   return vendor;
 }
 

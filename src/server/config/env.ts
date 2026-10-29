@@ -95,3 +95,6 @@ export function getEnv(): Env {
 if (typeof window === 'undefined') {
   getEnv();
 }
+
+// Export singleton instance
+export const env = getEnv();
