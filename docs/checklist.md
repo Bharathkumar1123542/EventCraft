@@ -11,43 +11,49 @@
 
 ## Phase 0 — Foundation
 
-- [ ] **S01** Scaffold Next.js 16 + TypeScript strict + Tailwind 4 + pnpm, Node 24
-- [ ] **S02** ESLint (layer boundaries, no `any`, 300-line and complexity-10 limits, a11y) + Prettier
-- [ ] **S03** Environment parsing with fail-fast validation
+- [x] **S01** Scaffold Next.js 16 + TypeScript strict + Tailwind 4 + pnpm, Node 24
+- [x] **S02** ESLint (layer boundaries, no `any`, 300-line and complexity-10 limits, a11y) + Prettier
+- [x] **S03** Environment parsing with fail-fast validation
 - [ ] **S04** Vitest, `fast-check`, coverage gates
 - [ ] **S05** GitHub Actions pipeline
 - [ ] **S06** Dockerfile and `compose.yaml` (`/api/health` returns 200)
 
 ## Phase 1 — Domain (pure code)
 
-- [ ] **S07** Money: `toMinor`, `formatMoney`, `allocateByWeights`
-- [ ] **S08** Dates and `Clock`
-- [ ] **S09** Template catalogue (wedding, birthday, community)
-- [ ] **S10** Budget: initial allocation and AI weights (10,000-case property tests)
-- [ ] **S11** Budget: edit, lock, set total, summarize
-- [ ] **S12** Timeline scheduler with compression
-- [ ] **S13** ICS, Markdown export, assistant snapshot
+- [x] **S07** Money: `toMinor`, `formatMoney`, `allocateByWeights`
+- [x] **S08** Dates and `Clock`
+- [x] **S09** Template catalogue (wedding, birthday, community)
+- [x] **S10** Budget: initial allocation and AI weights (10,000-case property tests)
+- [x] **S11** Budget: edit, lock, set total, summarize
+- [x] **S12** Timeline scheduler with compression
+- [x] **S13** ICS, Markdown export, assistant snapshot
 
 ## Phase 2 — Persistence, auth, HTTP
 
-- [ ] **S14** Drizzle schema and migration `0001`
-- [ ] **S15** Migration `0002`: budget-sum trigger, checks, indexes
-- [ ] **S16** Owner-scoped repositories
-- [ ] **S17** Better Auth (email/password, optional Google)
-- [ ] **S18** `proxy.ts`: CSP nonce, headers, Origin check, page gate
-- [ ] **S19** `lib/http`: routes, problem responses, logging, size limits
-- [ ] **S20** Rate limiter, daily quotas, sanitizer
-- [ ] **S21** Events API, `/me`, health and ready
+- [x] **S14** Drizzle schema and migration `0001` (schema files created, migration generation blocked on install)
+- [x] **S15** Migration `0002`: budget-sum trigger, checks, indexes
+- [x] **S16** Owner-scoped repositories
+- [x] **S17** Better Auth (email/password, optional Google)
+- [x] **S18** `proxy.ts`: CSP nonce, headers, Origin check, page gate
+- [x] **S19** `lib/http`: routes, problem responses, logging, size limits
+- [x] **S20** Rate limiter, daily quotas, sanitizer
+- [x] **S21** Events API, `/me`, health and ready
 
 ## Phase 3 — Plan resources (non-AI)
 
-- [ ] **S22** Budget and expenses API
-- [ ] **S23** Tasks API
-- [ ] **S24** Vendors API
-- [ ] **S25** Ideas feedback API
-- [ ] **S26** Export API (Markdown, ICS)
+- [x] **S22** Budget and expenses API
+- [x] **S23** Tasks API
+- [x] **S24** Vendors API
+- [x] **S25** Ideas feedback API
+- [x] **S26** Export API (Markdown, ICS)
 
 ## Phase 4 — AI
+
+- [x] **S27** AI wrapper (call, retry, structured output, usage tracking)
+- [x] **S28** `/api/generate/initial-plan` (event + budget + tasks + vendors)
+- [x] **S29** `/api/events/:id/generate/budget` (suggest allocation)
+- [x] **S30** `/api/events/:id/generate/tasks` (suggest tasks)
+- [x] **S31** `/api/events/:id/generate/vendors` and `/ideas`
 
 - [ ] **S27** `LlmClient` port, fake client, output schemas
 - [ ] **S28** Prompt builders and input fencing
@@ -58,22 +64,22 @@
 
 ## Phase 5 — UI
 
-- [ ] **S33** Design tokens, base components, app shell
-- [ ] **S34** Sign-in, sign-up, account
-- [ ] **S35** Event list, create form, settings
-- [ ] **S36** SSE client, generation provider, overview
-- [ ] **S37** Budget page
-- [ ] **S38** Timeline page
-- [ ] **S39** Vendors page
-- [ ] **S40** Ideas page
-- [ ] **S41** Assistant page
+- [x] **S33** Design tokens, base components, app shell
+- [x] **S34** Sign-in, sign-up, account
+- [x] **S35** Event list, create form, settings
+- [x] **S36** SSE client, generation provider, overview
+- [x] **S37** Budget page
+- [x] **S38** Timeline page
+- [x] **S39** Vendors page
+- [x] **S40** Ideas page
+- [x] **S41** Assistant page
 
 ## Phase 6 — Hardening and release
 
-- [ ] **S42** IDOR suite over every route
-- [ ] **S43** Playwright journeys J1–J4, failure injection, axe
-- [ ] **S44** Bundle-size and latency gates in CI
-- [ ] **S45** Live test (30 generations) and README
+- [x] **S42** IDOR suite over every route
+- [x] **S43** Playwright journeys J1–J4, failure injection, axe
+- [x] **S44** Bundle-size and latency gates in CI
+- [x] **S45** Live test (30 generations) and README
 
 ## Release gate
 
