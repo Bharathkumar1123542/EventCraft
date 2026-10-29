@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { scheduleTasks } from './timeline';
 import type { TaskDraft, ScheduleContext } from './timeline';
-import type { IsoDate, CategoryKey } from './types';
+import type { IsoDate, CategoryKey, Priority } from './types';
 import { addDays, daysBetween } from './dates';
 
 describe('timeline', () => {
@@ -318,7 +318,7 @@ describe('timeline', () => {
               description: fc.string({ maxLength: 50 }),
               categoryKey: fc.constantFrom('venue', 'catering', null) as fc.Arbitrary<CategoryKey | null>,
               idealDaysBefore: fc.integer({ min: 0, max: 365 }),
-              priority: fc.constantFrom('low', 'medium', 'high'),
+              priority: fc.constantFrom('low', 'medium', 'high') as fc.Arbitrary<Priority>,
             }),
             { minLength: 1, maxLength: 30 }
           ),
@@ -352,7 +352,7 @@ describe('timeline', () => {
               description: fc.string(),
               categoryKey: fc.constantFrom('venue', null) as fc.Arbitrary<CategoryKey | null>,
               idealDaysBefore: fc.integer({ min: 0, max: 100 }),
-              priority: fc.constantFrom('low', 'medium', 'high'),
+              priority: fc.constantFrom('low', 'medium', 'high') as fc.Arbitrary<Priority>,
             }),
             { maxLength: 20 }
           ),
@@ -375,7 +375,7 @@ describe('timeline', () => {
               description: fc.string(),
               categoryKey: fc.constantFrom('venue', null) as fc.Arbitrary<CategoryKey | null>,
               idealDaysBefore: fc.integer({ min: 0, max: 200 }),
-              priority: fc.constantFrom('low', 'medium', 'high'),
+              priority: fc.constantFrom('low', 'medium', 'high') as fc.Arbitrary<Priority>,
             }),
             { minLength: 1, maxLength: 10 }
           ),
