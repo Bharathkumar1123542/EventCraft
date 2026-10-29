@@ -36,7 +36,7 @@ import {
   buildVendorSuggestionPrompt,
   buildIdeaSuggestionPrompt,
 } from '../ai/prompts';
-import type { EventType, Currency } from '@/domain/types';
+import type { EventType, CurrencyCode } from '@/domain/types';
 
 export class GenerationService {
   constructor(private db: Database) {}
@@ -52,7 +52,7 @@ export class GenerationService {
     timezone: string;
     city: string | null;
     guestCount: number;
-    currency: Currency;
+    currency: CurrencyCode;
     totalBudgetMinor: number;
     userPrompt: string;
     preferences: Record<string, unknown>;
@@ -85,7 +85,10 @@ export class GenerationService {
     await budgetRepo.setCategories({
       eventId: event.id,
       ownerId: input.userId,
-      categories: result.data.budgetCategories,
+      categories: result.data.budgetCategories as Array<{
+        categoryKey: CategoryKey;
+        allocatedMinor: number;
+      }>,
     });
 
     // Create tasks

@@ -15,7 +15,7 @@ export const createEventSchema = z.object({
   guestCount: z.number().int().min(1).max(100000),
   currency: z.enum(['USD', 'EUR', 'GBP', 'INR', 'CAD', 'AUD', 'JPY']),
   totalBudgetMinor: z.number().int().min(0),
-  preferences: z.record(z.unknown()).optional(),
+  preferences: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const updateEventSchema = z.object({
@@ -24,7 +24,7 @@ export const updateEventSchema = z.object({
   timezone: z.string().min(1).max(100).optional(),
   city: z.string().min(1).max(200).nullable().optional(),
   guestCount: z.number().int().min(1).max(100000).optional(),
-  preferences: z.record(z.unknown()).optional(),
+  preferences: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
