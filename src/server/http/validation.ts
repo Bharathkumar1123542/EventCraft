@@ -25,7 +25,7 @@ export async function parseBody<T>(
         success: false,
         error: unprocessableEntity(
           'Validation failed',
-          error.errors.map((e) => ({
+          error.issues.map((e) => ({
             path: e.path.join('.'),
             message: e.message,
           }))
@@ -58,7 +58,7 @@ export function parseQuery<T>(
         success: false,
         error: unprocessableEntity(
           'Invalid query parameters',
-          error.errors.map((e) => ({
+          error.issues.map((e) => ({
             path: e.path.join('.'),
             message: e.message,
           }))

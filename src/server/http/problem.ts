@@ -7,11 +7,11 @@ import 'server-only';
 import { NextResponse } from 'next/server';
 
 export interface ProblemDetail {
-  type?: string;
+  type?: string | undefined;
   title: string;
   status: number;
-  detail?: string;
-  instance?: string;
+  detail?: string | undefined;
+  instance?: string | undefined;
   [key: string]: unknown;
 }
 
