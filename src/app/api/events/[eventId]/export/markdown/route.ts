@@ -78,7 +78,7 @@ export async function GET(
       })) ?? [],
       tasks?.map((t) => ({
         title: t.title,
-        dueDate: t.dueDate,
+        dueDate: t.dueDate as IsoDate,
         priority: t.priority,
         status: t.status,
       })) ?? [],

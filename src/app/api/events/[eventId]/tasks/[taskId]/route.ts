@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/server/auth/session';
 import { db } from '@/server/db/client';
 import { TasksRepository } from '@/server/db/repositories';
+import type { UpdateTaskInput } from '@/server/db/repositories/tasks.repository';
 import { updateTaskSchema } from '@/server/schemas/tasks.schema';
 import { parseBody, requireJsonContentType, checkBodySize } from '@/server/http/validation';
 import { unauthorized, notFound, badRequest } from '@/server/http/problem';
@@ -65,7 +66,7 @@ export async function PATCH(
     }
 
     const repo = new TasksRepository(db);
-    const task = await repo.update(taskId, userId, sanitized);
+    const task = await repo.update(taskId, userId, sanitized as UpdateTaskInput);
 
     if (!task) {
       const duration = Date.now() - start;

@@ -81,7 +81,7 @@ export async function generateStructured<T>(
           {
             name: schema.name,
             description: `Structured output for ${feature}`,
-            input_schema: schema.schema,
+            input_schema: schema.schema as any,
           },
         ],
         tool_choice: {
