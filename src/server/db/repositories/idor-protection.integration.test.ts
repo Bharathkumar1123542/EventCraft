@@ -14,7 +14,6 @@ import {
   TasksRepository,
   VendorsRepository,
   IdeasRepository,
-  ExpensesRepository,
 } from '.';
 import {
   createTestUser,
@@ -63,26 +62,26 @@ describe('Repository IDOR Protection', () => {
     it('should not allow User B to find User A\'s event by ID', async () => {
       const repo = new EventsRepository(db);
       
-      // If repository has a findById that checks ownership
-      // it should return null when userId doesn't match
-      const event = await repo.findById(eventAId);
+      // getById enforces ownership - User B should not see User A's event
+      const event = await repo.getById(eventAId, userB.id);
       
-      if (event) {
-        // If no ownership check in findById, verify at API level
-        expect(event.ownerId).toBe(userA.id);
-      }
+      // Should return null because userB doesn't own eventAId
+      expect(event).toBeNull();
     });
 
     it('should enforce ownership on update', async () => {
       const repo = new EventsRepository(db);
       
-      // Attempt to update should fail or no-op if ownership check exists
-      const result = await repo.update(eventAId, {
+      // User B attempts to update User A's event - should return null
+      const result = await repo.update(eventAId, userB.id, {
         title: 'Hacked by User B',
       });
 
-      // Verify the update didn't happen (implementation dependent)
-      const event = await repo.findById(eventAId);
+      // Should return null because userB doesn't own eventAId
+      expect(result).toBeNull();
+      
+      // Verify the update didn't happen
+      const event = await repo.getById(eventAId, userA.id);
       expect(event?.title).not.toBe('Hacked by User B');
     });
 
@@ -92,17 +91,13 @@ describe('Repository IDOR Protection', () => {
       // Create a temporary event for User A
       const tempEvent = await createTestEvent(userA.id, { title: 'Temp' });
       
-      // User B should not be able to delete it
-      // (This test assumes delete method exists)
       const beforeCount = (await repo.listByOwner(userA.id)).length;
       
-      // If repo has owner check, this should throw or no-op
-      try {
-        // await repo.delete(tempEvent.id, userB.id);
-        // If no owner check, this would delete it
-      } catch (e) {
-        // Expected - ownership check threw error
-      }
+      // User B should not be able to delete User A's event
+      const deleteResult = await repo.delete(tempEvent.id, userB.id);
+      
+      // Should return false because userB doesn't own the event
+      expect(deleteResult).toBe(false);
       
       const afterCount = (await repo.listByOwner(userA.id)).length;
       expect(afterCount).toBe(beforeCount);
@@ -114,36 +109,40 @@ describe('Repository IDOR Protection', () => {
 
     beforeEach(async () => {
       const categories = await createTestBudgetCategories(eventAId);
-      categoryKey = categories[0].key;
+      categoryKey = categories[0].categoryKey;
     });
 
     it('should not return User A\'s categories for User B', async () => {
       const repo = new BudgetRepository(db);
-      const categories = await repo.listCategories(eventAId);
+      
+      // User B attempts to get User A's categories - should return null
+      const categories = await repo.getCategories(eventAId, userB.id);
 
-      // At API level, event ownership check should happen first
-      // Here we verify categories are scoped to eventId
-      expect(categories.every(c => c.eventId === eventAId)).toBe(true);
+      // Should return null because userB doesn't own eventAId
+      expect(categories).toBeNull();
     });
 
     it('should not allow User B to update User A\'s budget allocation', async () => {
       const repo = new BudgetRepository(db);
       
-      const beforeUpdate = await repo.listCategories(eventAId);
-      const before = beforeUpdate.find(c => c.key === categoryKey);
+      const beforeUpdate = await repo.getCategories(eventAId, userA.id);
+      const before = beforeUpdate?.find(c => c.categoryKey === categoryKey);
 
-      // Attempt update (should be blocked at API level by event ownership)
-      // This tests repository doesn't bypass checks
-      try {
-        await repo.updateAllocation(eventAId, categoryKey, {
+      // User B attempts to set categories for User A's event - should return null
+      const result = await repo.setCategories({
+        eventId: eventAId,
+        ownerId: userB.id,
+        categories: [{
+          categoryKey: categoryKey as any,
           allocatedMinor: 999999,
-        });
-      } catch (e) {
-        // May throw if repository enforces ownership
-      }
+        }],
+      });
+      
+      // Should return null because userB doesn't own eventAId
+      expect(result).toBeNull();
 
-      const afterUpdate = await repo.listCategories(eventAId);
-      const after = afterUpdate.find(c => c.key === categoryKey);
+      const afterUpdate = await repo.getCategories(eventAId, userA.id);
+      const after = afterUpdate?.find(c => c.categoryKey === categoryKey);
 
       // Verify it wasn't changed without authorization
       expect(after?.allocatedMinor).toBe(before?.allocatedMinor);
@@ -160,10 +159,11 @@ describe('Repository IDOR Protection', () => {
 
     it('should scope tasks to event', async () => {
       const repo = new TasksRepository(db);
-      const tasks = await repo.listByEvent(eventAId);
+      const tasks = await repo.listByEvent(eventAId, userA.id);
 
-      expect(tasks.every(t => t.eventId === eventAId)).toBe(true);
-      expect(tasks.length).toBeGreaterThan(0);
+      expect(tasks).not.toBeNull();
+      expect(tasks!.every(t => t.eventId === eventAId)).toBe(true);
+      expect(tasks!.length).toBeGreaterThan(0);
     });
 
     it('should not allow cross-event task updates', async () => {
@@ -172,12 +172,14 @@ describe('Repository IDOR Protection', () => {
       // Create task in User B's event
       const taskB = await createTestTask(eventBId);
       
-      // Verify tasks are isolated
-      const tasksA = await repo.listByEvent(eventAId);
-      const tasksB = await repo.listByEvent(eventBId);
+      // Verify tasks are isolated - User B can't see User A's tasks
+      const tasksForUserB = await repo.listByEvent(eventAId, userB.id);
+      expect(tasksForUserB).toBeNull(); // Should be null because userB doesn't own eventAId
       
-      expect(tasksA.some(t => t.id === taskB.id)).toBe(false);
-      expect(tasksB.some(t => t.id === taskAId)).toBe(false);
+      // User A can see their own tasks
+      const tasksA = await repo.listByEvent(eventAId, userA.id);
+      expect(tasksA).not.toBeNull();
+      expect(tasksA!.some(t => t.id === taskB.id)).toBe(false);
     });
   });
 
@@ -191,24 +193,30 @@ describe('Repository IDOR Protection', () => {
 
     it('should scope vendors to event', async () => {
       const repo = new VendorsRepository(db);
-      const vendors = await repo.listByEvent(eventAId);
+      const vendors = await repo.listByEvent(eventAId, userA.id);
 
-      expect(vendors.every(v => v.eventId === eventAId)).toBe(true);
-      expect(vendors.length).toBeGreaterThan(0);
+      expect(vendors).not.toBeNull();
+      expect(vendors!.every(v => v.eventId === eventAId)).toBe(true);
+      expect(vendors!.length).toBeGreaterThan(0);
     });
 
     it('should not leak vendor data across events', async () => {
       const repo = new VendorsRepository(db);
       
       const vendorB = await createTestVendorItem(eventBId, {
-        vendorName: 'Secret Vendor',
+        need: 'Secret Vendor',
         notes: 'Private note from User B',
       });
       
-      const vendorsA = await repo.listByEvent(eventAId);
+      // User B cannot see User A's vendors
+      const vendorsForUserB = await repo.listByEvent(eventAId, userB.id);
+      expect(vendorsForUserB).toBeNull();
       
-      expect(vendorsA.some(v => v.id === vendorB.id)).toBe(false);
-      expect(vendorsA.some(v => v.notes?.includes('Private note'))).toBe(false);
+      // User A can see their own vendors
+      const vendorsA = await repo.listByEvent(eventAId, userA.id);
+      expect(vendorsA).not.toBeNull();
+      expect(vendorsA!.some(v => v.id === vendorB.id)).toBe(false);
+      expect(vendorsA!.some(v => v.notes?.includes('Private note'))).toBe(false);
     });
   });
 
@@ -222,9 +230,10 @@ describe('Repository IDOR Protection', () => {
 
     it('should scope ideas to event', async () => {
       const repo = new IdeasRepository(db);
-      const ideas = await repo.listByEvent(eventAId, {});
+      const ideas = await repo.listByEvent(eventAId, userA.id, {});
 
-      expect(ideas.every(i => i.eventId === eventAId)).toBe(true);
+      expect(ideas).not.toBeNull();
+      expect(ideas!.every(i => i.eventId === eventAId)).toBe(true);
     });
 
     it('should respect feedback isolation', async () => {
@@ -236,46 +245,53 @@ describe('Repository IDOR Protection', () => {
         isSaved: true,
       });
       
-      // User A should not see User B's feedback
-      const ideasA = await repo.listByEvent(eventAId, {});
+      // User A should not see User B's ideas
+      const ideasA = await repo.listByEvent(eventAId, userA.id, {});
       
-      expect(ideasA.some(i => i.id === ideaB.id)).toBe(false);
+      expect(ideasA).not.toBeNull();
+      expect(ideasA!.some(i => i.id === ideaB.id)).toBe(false);
     });
   });
 
-  describe('ExpensesRepository', () => {
+  describe('Expenses (via BudgetRepository)', () => {
     let expenseAId: string;
     let categoryKey: string;
 
     beforeEach(async () => {
       const categories = await createTestBudgetCategories(eventAId);
-      categoryKey = categories[0].key;
+      categoryKey = categories[0].categoryKey;
       const expense = await createTestExpense(eventAId, categoryKey);
       expenseAId = expense.id;
     });
 
     it('should scope expenses to event', async () => {
-      const repo = new ExpensesRepository(db);
-      const expenses = await repo.listByEvent(eventAId);
+      const repo = new BudgetRepository(db);
+      const expenses = await repo.listExpenses(eventAId, userA.id);
 
-      expect(expenses.every(e => e.eventId === eventAId)).toBe(true);
-      expect(expenses.length).toBeGreaterThan(0);
+      expect(expenses).not.toBeNull();
+      expect(expenses!.every(e => e.eventId === eventAId)).toBe(true);
+      expect(expenses!.length).toBeGreaterThan(0);
     });
 
     it('should not allow cross-event expense access', async () => {
-      const repo = new ExpensesRepository(db);
+      const repo = new BudgetRepository(db);
       
       // Create expense in User B's event
       const categoriesB = await createTestBudgetCategories(eventBId);
-      const expenseB = await createTestExpense(eventBId, categoriesB[0].key, {
-        description: 'Secret expense',
+      const expenseB = await createTestExpense(eventBId, categoriesB[0].categoryKey, {
+        label: 'Secret expense',
         amountMinor: 999999,
       });
       
-      const expensesA = await repo.listByEvent(eventAId);
+      // User B cannot see User A's expenses
+      const expensesForUserB = await repo.listExpenses(eventAId, userB.id);
+      expect(expensesForUserB).toBeNull();
       
-      expect(expensesA.some(e => e.id === expenseB.id)).toBe(false);
-      expect(expensesA.some(e => e.description.includes('Secret'))).toBe(false);
+      // User A can see their own expenses
+      const expensesA = await repo.listExpenses(eventAId, userA.id);
+      expect(expensesA).not.toBeNull();
+      expect(expensesA!.some(e => e.id === expenseB.id)).toBe(false);
+      expect(expensesA!.some(e => e.label.includes('Secret'))).toBe(false);
     });
   });
 
@@ -284,37 +300,41 @@ describe('Repository IDOR Protection', () => {
       // User A creates full event with all resources
       const categoriesA = await createTestBudgetCategories(eventAId);
       await createTestTask(eventAId, { title: 'User A Task' });
-      await createTestVendorItem(eventAId, { vendorName: 'User A Vendor' });
+      await createTestVendorItem(eventAId, { need: 'User A Vendor' });
       await createTestIdea(eventAId, { title: 'User A Idea' });
-      await createTestExpense(eventAId, categoriesA[0].key);
+      await createTestExpense(eventAId, categoriesA[0]!.categoryKey);
 
       // User B creates full event with all resources
       const categoriesB = await createTestBudgetCategories(eventBId);
       await createTestTask(eventBId, { title: 'User B Task' });
-      await createTestVendorItem(eventBId, { vendorName: 'User B Vendor' });
+      await createTestVendorItem(eventBId, { need: 'User B Vendor' });
       await createTestIdea(eventBId, { title: 'User B Idea' });
-      await createTestExpense(eventBId, categoriesB[0].key);
+      await createTestExpense(eventBId, categoriesB[0]!.categoryKey);
 
-      // Verify no data leakage
+      // Verify no data leakage - User A can only see their own data
       const budgetRepo = new BudgetRepository(db);
       const taskRepo = new TasksRepository(db);
       const vendorRepo = new VendorsRepository(db);
       const ideaRepo = new IdeasRepository(db);
-      const expenseRepo = new ExpensesRepository(db);
 
       const [categoriesA_fetched, tasksA, vendorsA, ideasA, expensesA] = await Promise.all([
-        budgetRepo.listCategories(eventAId),
-        taskRepo.listByEvent(eventAId),
-        vendorRepo.listByEvent(eventAId),
-        ideaRepo.listByEvent(eventAId, {}),
-        expenseRepo.listByEvent(eventAId),
+        budgetRepo.getCategories(eventAId, userA.id),
+        taskRepo.listByEvent(eventAId, userA.id),
+        vendorRepo.listByEvent(eventAId, userA.id),
+        ideaRepo.listByEvent(eventAId, userA.id, {}),
+        budgetRepo.listExpenses(eventAId, userA.id),
       ]);
 
       // None of User A's queries should return User B's data
-      expect(tasksA.every(t => !t.title.includes('User B'))).toBe(true);
-      expect(vendorsA.every(v => v.vendorName !== 'User B Vendor')).toBe(true);
-      expect(ideasA.every(i => !i.title.includes('User B'))).toBe(true);
-      expect(expensesA.every(e => e.eventId === eventAId)).toBe(true);
+      expect(tasksA).not.toBeNull();
+      expect(vendorsA).not.toBeNull();
+      expect(ideasA).not.toBeNull();
+      expect(expensesA).not.toBeNull();
+      
+      expect(tasksA!.every((t: any) => !t.title.includes('User B'))).toBe(true);
+      expect(vendorsA!.every((v: any) => v.need !== 'User B Vendor')).toBe(true);
+      expect(ideasA!.every((i: any) => !i.title.includes('User B'))).toBe(true);
+      expect(expensesA!.every((e: any) => e.eventId === eventAId)).toBe(true);
     });
   });
 });
