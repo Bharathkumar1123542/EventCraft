@@ -17,6 +17,7 @@ export interface TaskDraft {
 export interface ScheduledTask extends TaskDraft {
   dueDate: IsoDate;
   isCompressed: boolean;
+  __originalIndex?: number; // Internal: for stable sorting
 }
 
 export interface ScheduleContext {
@@ -64,6 +65,7 @@ export function scheduleTasks(drafts: readonly TaskDraft[], ctx: ScheduleContext
     ...t.draft,
     dueDate: t.ideal,
     isCompressed: false,
+    __originalIndex: t.index,
   }));
 
   // If no late tasks, return on-time only
@@ -71,7 +73,7 @@ export function scheduleTasks(drafts: readonly TaskDraft[], ctx: ScheduleContext
     return onTimeScheduled.sort((a, b) => {
       const dateDiff = daysBetween(a.dueDate, b.dueDate);
       if (dateDiff !== 0) return dateDiff;
-      return withIdeal.find((t) => t.draft === a)!.index - withIdeal.find((t) => t.draft === b)!.index;
+      return (a.__originalIndex ?? 0) - (b.__originalIndex ?? 0);
     });
   }
 
@@ -100,6 +102,7 @@ export function scheduleTasks(drafts: readonly TaskDraft[], ctx: ScheduleContext
       ...t.draft,
       dueDate,
       isCompressed: true,
+      __originalIndex: t.index,
     };
   });
 
@@ -108,8 +111,6 @@ export function scheduleTasks(drafts: readonly TaskDraft[], ctx: ScheduleContext
   return all.sort((a, b) => {
     const dateDiff = daysBetween(a.dueDate, b.dueDate);
     if (dateDiff !== 0) return dateDiff;
-    const indexA = withIdeal.find((t) => t.draft.title === a.title)!.index;
-    const indexB = withIdeal.find((t) => t.draft.title === b.title)!.index;
-    return indexA - indexB;
+    return (a.__originalIndex ?? 0) - (b.__originalIndex ?? 0);
   });
 }
