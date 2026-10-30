@@ -11,8 +11,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from '@/lib/client/auth';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
@@ -63,5 +64,17 @@ export default function HomePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <React.Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-bg">
+        <Spinner size="lg" />
+      </div>
+    }>
+      <HomePageContent />
+    </React.Suspense>
   );
 }

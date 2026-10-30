@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { GoogleButton } from '@/components/auth/google-button';
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams?.get('redirect') || '/events';
@@ -140,5 +140,17 @@ export default function SignInPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-bg">
+        <Spinner size="lg" />
+      </div>
+    }>
+      <SignInForm />
+    </React.Suspense>
   );
 }

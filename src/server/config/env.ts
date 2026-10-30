@@ -38,7 +38,7 @@ const envSchema = z
     FAKE_LLM_FAIL_SECTIONS: z.string().default(''),
     FAKE_LLM_DELAY_MS: z.coerce.number().int().min(0).default(0),
   })
-  .strict()
+  .passthrough()
   .superRefine((data, ctx) => {
     // Google OAuth: both or neither
     const hasClientId = !!data.GOOGLE_CLIENT_ID;
