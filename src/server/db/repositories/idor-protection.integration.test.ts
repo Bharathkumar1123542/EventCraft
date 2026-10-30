@@ -109,7 +109,7 @@ describe('Repository IDOR Protection', () => {
 
     beforeEach(async () => {
       const categories = await createTestBudgetCategories(eventAId);
-      categoryKey = categories[0].categoryKey;
+      categoryKey = categories[0]!.categoryKey;
     });
 
     it('should not return User A\'s categories for User B', async () => {
@@ -230,7 +230,7 @@ describe('Repository IDOR Protection', () => {
 
     it('should scope ideas to event', async () => {
       const repo = new IdeasRepository(db);
-      const ideas = await repo.listByEvent(eventAId, userA.id, {});
+      const ideas = await repo.listByEvent(eventAId, userA.id);
 
       expect(ideas).not.toBeNull();
       expect(ideas!.every(i => i.eventId === eventAId)).toBe(true);
@@ -246,7 +246,7 @@ describe('Repository IDOR Protection', () => {
       });
       
       // User A should not see User B's ideas
-      const ideasA = await repo.listByEvent(eventAId, userA.id, {});
+      const ideasA = await repo.listByEvent(eventAId, userA.id);
       
       expect(ideasA).not.toBeNull();
       expect(ideasA!.some(i => i.id === ideaB.id)).toBe(false);
@@ -259,7 +259,7 @@ describe('Repository IDOR Protection', () => {
 
     beforeEach(async () => {
       const categories = await createTestBudgetCategories(eventAId);
-      categoryKey = categories[0].categoryKey;
+      categoryKey = categories[0]!.categoryKey;
       const expense = await createTestExpense(eventAId, categoryKey);
       expenseAId = expense.id;
     });
@@ -278,7 +278,7 @@ describe('Repository IDOR Protection', () => {
       
       // Create expense in User B's event
       const categoriesB = await createTestBudgetCategories(eventBId);
-      const expenseB = await createTestExpense(eventBId, categoriesB[0].categoryKey, {
+      const expenseB = await createTestExpense(eventBId, categoriesB[0]!.categoryKey, {
         label: 'Secret expense',
         amountMinor: 999999,
       });
@@ -321,7 +321,7 @@ describe('Repository IDOR Protection', () => {
         budgetRepo.getCategories(eventAId, userA.id),
         taskRepo.listByEvent(eventAId, userA.id),
         vendorRepo.listByEvent(eventAId, userA.id),
-        ideaRepo.listByEvent(eventAId, userA.id, {}),
+        ideaRepo.listByEvent(eventAId, userA.id),
         budgetRepo.listExpenses(eventAId, userA.id),
       ]);
 
