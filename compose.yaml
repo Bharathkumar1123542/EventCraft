@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: eventcraft
+      POSTGRES_PASSWORD: eventcraft
+      POSTGRES_DB: eventcraft
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventcraft"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: deps
+    environment:
+      DATABASE_URL: postgresql://eventcraft:eventcraft@db:5432/eventcraft
+    command: pnpm db:migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./drizzle:/app/drizzle
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      NODE_ENV: production
+      APP_URL: http://localhost:3000
+      DATABASE_URL: postgresql://eventcraft:eventcraft@db:5432/eventcraft
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      LLM_PROVIDER: anthropic
+      LLM_MODEL_PRIMARY: claude-sonnet-5-5
+      LLM_MODEL_FAST: claude-haiku-5-5
+    ports:
+      - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:
