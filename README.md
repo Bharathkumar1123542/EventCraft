@@ -1,26 +1,26 @@
 # EventCraft
 
-> AI-powered event management platform that turns event descriptions into complete plans with budgets, timelines, vendor checklists, and personalized ideas.
+> AI-powered event management platform that transforms event descriptions into complete plans with budgets, timelines, vendor checklists, and personalized ideas.
 
-Built with Next.js 16, TypeScript, PostgreSQL, and Claude AI.
+**Tech Stack:** Next.js 16 · TypeScript · PostgreSQL · Claude AI · TanStack Query · Tailwind CSS 4
 
-## Quick Start
+---
+
+## 🚀 Quick Start
 
 ```bash
 # 1. Install dependencies
 corepack enable && pnpm install
 
-# 2. Set up environment
+# 2. Configure environment
 cp .env.example .env.local
-# Edit .env.local with your DATABASE_URL, BETTER_AUTH_SECRET, and ANTHROPIC_API_KEY
+# Edit .env.local: Add DATABASE_URL, BETTER_AUTH_SECRET, ANTHROPIC_API_KEY
 
-# 3. Start database
+# 3. Start database & run migrations
 docker compose up db -d
-
-# 4. Run migrations
 pnpm db:migrate
 
-# 5. Start development server
+# 4. Start development server
 pnpm dev
 ```
 
@@ -28,149 +28,76 @@ Open [http://localhost:3000](http://localhost:3000) and create your first event!
 
 ---
 
-## Table of Contents
+## 📋 Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Installation](#installation)
-3. [Configuration](#configuration)
-4. [Development](#development)
-5. [Testing](#testing)
-6. [Deployment](#deployment)
-7. [Project Structure](#project-structure)
-8. [Architecture](#architecture)
-9. [Key Concepts](#key-concepts)
-10. [Documentation](#documentation)
-11. [Contributing](#contributing)
-12. [License](#license)
+- [Prerequisites](#prerequisites)
+- [Installation & Setup](#installation--setup)
+- [Development](#development)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Architecture Overview](#architecture-overview)
+- [Project Documentation](#project-documentation)
 
 ---
 
 ## Prerequisites
 
-- **Node.js** ≥ 24.0.0 (LTS)
-- **pnpm** ≥ 10.0.0
-- **PostgreSQL** 16
-- **Anthropic API key** ([Get one here](https://console.anthropic.com/))
+| Requirement | Version | Get It |
+|------------|---------|--------|
+| Node.js | ≥ 24.0.0 | [nodejs.org](https://nodejs.org) |
+| pnpm | ≥ 10.0.0 | `corepack enable` |
+| PostgreSQL | 16 | [Docker](#database-setup) or local install |
+| Anthropic API Key | - | [console.anthropic.com](https://console.anthropic.com/) |
 
-### System Requirements
-
-- **Memory:** 512 MB RAM minimum
-- **Storage:** 1 GB free space
-- **OS:** Linux, macOS, or Windows (with WSL2 recommended)
+**System Requirements:** 512 MB RAM · 1 GB storage · Linux/macOS/Windows (WSL2)
 
 ---
 
-## Installation
+## Installation & Setup
 
-### 1. Clone Repository
+### 1. Clone & Install
 
 ```bash
 git clone <repository-url>
 cd eventcraft
-```
-
-### 2. Enable Corepack
-
-```bash
 corepack enable
-corepack prepare pnpm@10.0.0 --activate
-```
-
-### 3. Install Dependencies
-
-```bash
 pnpm install
 ```
 
-This will install:
-- Next.js 16 (React 19, App Router)
-- Drizzle ORM with PostgreSQL driver
-- Better Auth for authentication
-- Anthropic SDK for AI features
-- TanStack Query for data fetching
-- Radix UI for accessible components
-- Tailwind CSS 4 for styling
+### 2. Environment Configuration
 
----
-
-## Configuration
-
-### Environment Variables
-
-Create `.env.local` from the template:
+Create `.env.local` from template:
 
 ```bash
 cp .env.example .env.local
 ```
 
-#### Required Variables
+**Required variables:**
 
 ```bash
-# Application
-APP_URL=http://localhost:3000
-NODE_ENV=development
-
-# Database
 DATABASE_URL=postgresql://user:password@localhost:5432/eventcraft
-
-# Authentication
-BETTER_AUTH_SECRET=your-secret-at-least-32-characters-long
-
-# AI Provider
-LLM_PROVIDER=anthropic
+BETTER_AUTH_SECRET=your-secret-minimum-32-characters-long
 ANTHROPIC_API_KEY=sk-ant-your-api-key
+APP_URL=http://localhost:3000
 ```
 
-#### Optional Variables
+**Optional variables:** Google OAuth (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`), rate limiting quotas, AI model selection. See `.env.example` for full list.
+
+### 3. Database Setup
+
+**Option A: Docker (Recommended)**
 
 ```bash
-# Google OAuth (optional - both or neither)
-GOOGLE_CLIENT_ID=your-client-id
-GOOGLE_CLIENT_SECRET=your-client-secret
-
-# Rate Limiting
-QUOTA_GENERATIONS_PER_DAY=10
-QUOTA_ASSISTANT_MESSAGES_PER_DAY=50
-
-# AI Models
-LLM_MODEL_PRIMARY=claude-sonnet-4
-LLM_MODEL_FAST=claude-haiku-4
-
-# Database
-DB_POOL_MAX=10
-
-# Logging
-LOG_LEVEL=info
-
-# Proxy (if behind reverse proxy)
-TRUST_PROXY_HOPS=0
-```
-
-### Database Setup
-
-#### Option 1: Docker Compose (Recommended)
-
-```bash
-# Start PostgreSQL
 docker compose up db -d
-
-# Run migrations
 pnpm db:migrate
-
-# (Optional) Open Drizzle Studio
-pnpm db:studio
+pnpm db:studio  # Optional: Open database GUI
 ```
 
-#### Option 2: Local PostgreSQL
+**Option B: Local PostgreSQL**
 
 ```bash
-# Create database
 createdb eventcraft
-
-# Set DATABASE_URL in .env.local
-DATABASE_URL=postgresql://localhost:5432/eventcraft
-
-# Run migrations
+# Update DATABASE_URL in .env.local
 pnpm db:migrate
 ```
 
@@ -178,202 +105,148 @@ pnpm db:migrate
 
 ## Development
 
-### Start Development Server
+### Common Commands
 
 ```bash
-pnpm dev
+pnpm dev              # Start development server (localhost:3000)
+pnpm build            # Build for production
+pnpm start            # Start production server
+pnpm lint             # Run linter
+pnpm typecheck        # TypeScript type checking
+pnpm test             # Run unit tests
+pnpm check:all        # Run all checks (lint + typecheck + tests)
 ```
 
-Server runs at [http://localhost:3000](http://localhost:3000)
+### Database Operations
+
+```bash
+pnpm db:generate      # Generate migration from schema changes
+pnpm db:migrate       # Apply pending migrations
+pnpm db:studio        # Open Drizzle Studio GUI
+```
 
 ### Development Workflow
 
-1. **Make changes** to code
-2. **Run linter:** `pnpm lint`
-3. **Type check:** `pnpm typecheck`
-4. **Run tests:** `pnpm test`
-5. **Check changes** in browser (hot reload enabled)
-6. **Commit** changes
-
-### Database Migrations
-
-```bash
-# Generate migration from schema changes
-pnpm db:generate
-
-# Apply migrations
-pnpm db:migrate
-
-# Open database GUI
-pnpm db:studio
-```
-
-### Useful Commands
-
-```bash
-# Full quality check before commit
-pnpm check:all  # Runs lint, typecheck, unit tests, integration tests
-
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
-
-# Check bundle sizes
-pnpm check:bundle
-```
+1. Make code changes (hot reload enabled)
+2. Run `pnpm lint` and `pnpm typecheck`
+3. Write tests and run `pnpm test`
+4. Run `pnpm check:all` before committing
+5. Commit changes with conventional commit format
 
 ---
 
 ## Testing
 
-### Unit Tests
+### Unit & Integration Tests
 
 ```bash
-# Run once
-pnpm test
-
-# Watch mode
-pnpm test:watch
-
-# With coverage
-pnpm test -- --coverage
+pnpm test                    # Run once
+pnpm test:watch              # Watch mode
+pnpm test:integration        # Integration tests (requires PostgreSQL)
+pnpm test -- --coverage      # With coverage report
 ```
 
-**Coverage Thresholds:**
-- Domain logic: 95% lines, 90% branches
-- Services: 85% lines, 75% branches
-- Global: 80% lines, 70% branches
-
-### Integration Tests
-
-```bash
-# Requires PostgreSQL running
-pnpm test:integration
-```
-
-Tests repositories, services, and database triggers.
+**Coverage targets:** Domain logic 95% · Services 85% · Global 80%
 
 ### End-to-End Tests
 
 ```bash
-# Start app first
-pnpm build && pnpm start
-
-# Run E2E tests (in another terminal)
-pnpm test:e2e
+pnpm build && pnpm start     # Terminal 1: Start production server
+pnpm test:e2e                # Terminal 2: Run Playwright tests
 ```
 
-Tests four complete user journeys:
-- **J1:** Wedding planner (sign-up → plan → lock budget → expense → task)
-- **J2:** Birthday parent (create → ideas feedback → regenerate → export .ics)
-- **J3:** Community volunteer (create → vendor checklist → status pipeline)
-- **J4:** Mid-planning user (assistant chat with contextual answers)
+Tests 4 user journeys (wedding planner, birthday parent, community volunteer, assistant chat) + accessibility validation across 12 pages.
 
-Also includes accessibility testing with axe-core on all 12 pages.
-
-### Performance Tests
+### Performance & Live Tests
 
 ```bash
-# Start server with fake LLM
-LLM_PROVIDER=fake pnpm dev
+# Performance smoke test (requires fake LLM provider)
+LLM_PROVIDER=fake pnpm dev   # Terminal 1
+pnpm test:perf               # Terminal 2
 
-# Run performance tests (in another terminal)
-pnpm test:perf
-```
-
-Tests latency with 20 concurrent connections:
-- Read operations: p95 ≤ 200ms
-- Write operations: p95 ≤ 300ms
-
-### Live Generation Test
-
-⚠️ **Warning:** Uses real Anthropic API and costs money!
-
-```bash
-# Run 30 real AI generations
+# Live AI generation test (⚠️ costs money - uses real Anthropic API)
 ANTHROPIC_API_KEY=sk-ant-... pnpm test:live
 ```
-
-Success criteria: ≥29/30 must validate (96.7% success rate)
 
 ---
 
 ## Deployment
 
-### Docker
-
-#### Build Image
+### Docker Deployment
 
 ```bash
+# Build image
 docker build -t eventcraft:latest -f docker/Dockerfile .
-```
 
-#### Run with Docker Compose
-
-```bash
-# Set required environment variables
+# Run with Docker Compose
 export ANTHROPIC_API_KEY=sk-ant-your-key
-export BETTER_AUTH_SECRET=your-secret-here
-
-# Start all services
+export BETTER_AUTH_SECRET=your-production-secret
 docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop
-docker compose down
 ```
 
-Services:
-- **app:** Next.js application (port 3000)
-- **db:** PostgreSQL 16 (port 5432)
+**Services:** `app` (Next.js on port 3000) · `db` (PostgreSQL 16 on port 5432)
 
-#### Environment Variables for Production
+### Cloud Platforms
 
-```bash
-# Required
-DATABASE_URL=postgresql://user:pass@db:5432/eventcraft
-BETTER_AUTH_SECRET=<32+ character secret>
-ANTHROPIC_API_KEY=sk-ant-<your-key>
-APP_URL=https://yourdomain.com
+Compatible with **Vercel**, **AWS** (ECS/Fargate + RDS), **Google Cloud** (Cloud Run + Cloud SQL), **Azure** (App Service + Database for PostgreSQL)
 
-# Recommended
-NODE_ENV=production
-LOG_LEVEL=warn
-QUOTA_GENERATIONS_PER_DAY=10
-QUOTA_ASSISTANT_MESSAGES_PER_DAY=50
+**Health endpoints:**
+- `GET /api/health` - Liveness check (no dependencies)
+- `GET /api/ready` - Readiness check (includes database)
+
+## Architecture Overview
+
+### Tech Stack
+
+**Frontend:** Next.js 16 (React 19, App Router) · Tailwind CSS 4 · Radix UI · TanStack Query  
+**Backend:** Next.js API Routes · PostgreSQL 16 · Drizzle ORM  
+**Auth:** Better Auth (email/password + Google OAuth)  
+**AI:** Anthropic Claude (Sonnet 4 primary, Haiku 4 fast)  
+**Testing:** Vitest · Playwright · axe-core (accessibility)
+
+### Layer Architecture
+
+```
+UI Layer (Client Components)
+    ↓ HTTP requests
+API Layer (Route Handlers: auth, validation, rate limiting)
+    ↓ 
+Service Layer (business logic coordination)
+    ↓                           ↓
+Domain Layer                Data Layer
+(pure functions)            (repositories, SQL)
 ```
 
-### Cloud Deployment
+### Design Principles
 
-EventCraft works on any platform supporting Node.js 24+ and PostgreSQL 16:
+**Money Handling:** All amounts stored as integer minor units (e.g., 5000000 = $50,000.00) to avoid floating-point errors.
 
-- **Vercel:** Deploy with PostgreSQL add-on
-- **AWS:** ECS/Fargate + RDS PostgreSQL
-- **Google Cloud:** Cloud Run + Cloud SQL
-- **Azure:** App Service + Azure Database for PostgreSQL
+**Date Handling:** All date calculations use event's timezone via `IsoDate` type (`YYYY-MM-DD` strings).
 
-#### Health Checks
+**Core Features:**
+- **Event Types:** Wedding, Birthday, Community (each with specialized templates)
+- **Budget Management:** AI allocation, category locking, expense tracking
+- **Timeline Scheduling:** Smart task scheduling with dependencies and compression
+- **Vendor Pipeline:** not_started → contacted → quoted → booked/declined
+- **Ideas Feedback:** Like/dislike/save system with regeneration
+- **AI Assistant:** Context-aware chat with streaming responses
 
-- **Liveness:** `GET /api/health` (no dependencies)
-- **Readiness:** `GET /api/ready` (checks database)
+---
 
-### Production Checklist
+## Project Documentation
 
-- [ ] Set `NODE_ENV=production`
-- [ ] Use strong `BETTER_AUTH_SECRET` (32+ random characters)
-- [ ] Configure `APP_URL` with your domain
-- [ ] Set up PostgreSQL with connection pooling
-- [ ] Configure reverse proxy (nginx/Traefik)
-- [ ] Enable HTTPS
-- [ ] Set `TRUST_PROXY_HOPS` if behind proxy
-- [ ] Configure rate limiting quotas
-- [ ] Set up monitoring and logging
-- [ ] Run database migrations before deployment
-- [ ] Test with `pnpm test:e2e` in staging
+### For Developers
+- **[docs/architecture.md](docs/architecture.md)** - Detailed system architecture and design decisions
+- **[docs/spec.md](docs/spec.md)** - Technical specification (data models, APIs, testing strategy)
+- **[docs/plan.md](docs/plan.md)** - Implementation plan and milestones
+
+### For Users & Stakeholders
+- **[docs/prd.md](docs/prd.md)** - Product requirements and features
+- **[docs/scope.md](docs/scope.md)** - Project scope boundaries
+
+### For QA & Testing
+- **[docs/checklist.md](docs/checklist.md)** - Build checklist and test plan
+- **[scripts/README.md](scripts/README.md)** - Testing scripts documentation
 
 ---
 
@@ -381,263 +254,54 @@ EventCraft works on any platform supporting Node.js 24+ and PostgreSQL 16:
 
 ```
 eventcraft/
-├── .github/
-│   └── workflows/
-│       └── ci.yml              # CI/CD pipeline
-├── docs/                        # Project documentation
-│   ├── architecture.md          # System architecture
-│   ├── prd.md                   # Product requirements
-│   ├── spec.md                  # Technical specification
-│   ├── plan.md                  # Implementation plan
-│   ├── scope.md                 # Project scope
-│   └── checklist.md             # Build checklist
-├── drizzle/                     # SQL migrations
-├── e2e/                         # End-to-end tests (Playwright)
-├── scripts/                     # Utility scripts
-│   ├── check-bundle-size.ts    # Bundle size checker
-│   ├── perf-smoke.ts            # Performance tests
-│   ├── live-test.ts             # Live AI validation
-│   └── migrate.ts               # Database migration runner
 ├── src/
-│   ├── app/                     # Next.js App Router
-│   │   ├── (app)/              # Authenticated routes
-│   │   ├── (public)/           # Public routes
-│   │   ├── api/                # API routes
-│   │   ├── layout.tsx          # Root layout
-│   │   └── page.tsx            # Landing page
-│   ├── components/              # React components
-│   │   ├── auth/               # Auth components
-│   │   ├── layout/             # Layout components
-│   │   └── ui/                 # UI primitives
-│   ├── domain/                  # Pure business logic
-│   │   ├── budget.ts           # Budget allocation
-│   │   ├── timeline.ts         # Task scheduling
-│   │   ├── money.ts            # Currency handling
-│   │   ├── dates.ts            # Date utilities
-│   │   ├── ics.ts              # Calendar export
-│   │   └── templates.ts        # Event templates
-│   ├── lib/                     # Shared utilities
-│   │   ├── client/             # Client-side utilities
-│   │   └── utils.ts            # Common helpers
-│   ├── schemas/                 # Zod validation schemas
-│   ├── server/                  # Server-side code
-│   │   ├── ai/                 # LLM integration
-│   │   ├── auth/               # Authentication
-│   │   ├── config/             # Configuration
-│   │   ├── db/                 # Database layer
-│   │   │   ├── client.ts       # DB client
-│   │   │   ├── schema/         # Drizzle schema
-│   │   │   └── repositories/   # Data access
-│   │   ├── http/               # HTTP utilities
-│   │   ├── schemas/            # Server schemas
-│   │   ├── security/           # Security (rate limiting, sanitization)
-│   │   ├── services/           # Business logic
-│   │   └── testing/            # Test helpers
-│   └── middleware.ts            # Next.js middleware
-├── docker/
-│   └── Dockerfile               # Production Docker image
-├── compose.yaml                 # Docker Compose config
-├── drizzle.config.ts            # Drizzle configuration
-├── next.config.ts               # Next.js configuration
-├── playwright.config.ts         # Playwright configuration
-├── tailwind.config.ts           # Tailwind configuration
-├── tsconfig.json                # TypeScript configuration
-├── vitest.config.ts             # Vitest configuration
-├── package.json                 # Dependencies and scripts
-└── README.md                    # This file
+│   ├── app/                 # Next.js App Router (routes, layouts, API)
+│   ├── components/          # React components (auth, layout, UI primitives)
+│   ├── domain/              # Pure business logic (no I/O)
+│   ├── server/              # Server-side code
+│   │   ├── ai/              # LLM integration
+│   │   ├── auth/            # Better Auth configuration
+│   │   ├── db/              # Database (schema, repositories, client)
+│   │   ├── services/        # Business logic services
+│   │   └── security/        # Rate limiting, input sanitization
+│   ├── schemas/             # Zod validation schemas
+│   └── lib/                 # Shared utilities
+├── e2e/                     # Playwright end-to-end tests
+├── scripts/                 # Testing & utility scripts
+├── docs/                    # Comprehensive documentation
+└── drizzle/                 # SQL migrations
 ```
-
----
-
-## Architecture
-
-### Tech Stack
-
-- **Frontend:** Next.js 16 (React 19, App Router, Server Components)
-- **Styling:** Tailwind CSS 4
-- **UI Components:** Radix UI primitives
-- **State Management:** TanStack Query
-- **Backend:** Next.js API Routes
-- **Database:** PostgreSQL 16 + Drizzle ORM
-- **Authentication:** Better Auth (email/password + Google OAuth)
-- **AI:** Anthropic Claude (Sonnet 4 primary, Haiku 4 fast)
-- **Testing:** Vitest (unit/integration), Playwright (E2E), axe-core (a11y)
-
-### Key Design Patterns
-
-#### Layer Architecture
-
-```
-┌─────────────────────────────────────┐
-│  UI Layer (Client Components)       │
-│  - Forms, tables, dialogs           │
-│  - TanStack Query for data          │
-└─────────────────────────────────────┘
-              ↓ HTTP
-┌─────────────────────────────────────┐
-│  API Layer (Route Handlers)         │
-│  - Authentication                   │
-│  - Validation (Zod)                 │
-│  - Rate limiting                    │
-└─────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────┐
-│  Service Layer                      │
-│  - Business logic coordination      │
-│  - Domain calls                     │
-│  - Repository calls                 │
-└─────────────────────────────────────┘
-       ↓                    ↓
-┌────────────────┐   ┌──────────────┐
-│ Domain Layer   │   │ Data Layer   │
-│ Pure functions │   │ Repositories │
-│ No I/O         │   │ SQL queries  │
-└────────────────┘   └──────────────┘
-```
-
-#### Money Handling
-
-All monetary values stored as **integer minor units**:
-
-```typescript
-// ✅ Correct
-const budgetMinor = 5000000;  // $50,000.00
-
-// ❌ Wrong
-const budget = 50000.00;  // Floating-point precision issues
-```
-
-Convert for display only:
-
-```typescript
-function formatMoney(minor: number, currency: string): string {
-  const decimals = CURRENCY_DECIMALS[currency] || 2;
-  const major = minor / Math.pow(10, decimals);
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(major);
-}
-```
-
-#### Date Handling
-
-All dates computed in event's timezone:
-
-```typescript
-// ✅ Correct
-const today = clock.today(event.timezone);
-
-// ❌ Wrong
-const today = new Date();  // Uses server timezone
-```
-
-Use `IsoDate` type (`YYYY-MM-DD` string) for calendar dates.
-
----
-
-## Key Concepts
-
-### Event Types
-
-Three event types with specialized templates:
-
-1. **Wedding** - Large guest count, venue priority, photographer emphasis
-2. **Birthday** - Age-appropriate ideas, entertainment focus
-3. **Community** - Permits, insurance, accessibility requirements
-
-### Budget Allocation
-
-- **Initial:** AI suggests allocation based on event type and total budget
-- **Rebalancing:** When locked categories exist, others rebalance proportionally
-- **Categories:** 3-15 per event, each with allocated/committed/paid/remaining
-- **Expenses:** Track against categories, marked as paid/unpaid
-
-### Timeline Scheduling
-
-- **Ideal spacing:** Tasks scheduled with buffer time
-- **Compression:** When event date is soon, tasks may be "compressed"
-- **Dependencies:** Critical tasks scheduled first
-- **Priorities:** High/medium/low affect urgency
-
-### Vendor Checklist
-
-- **Needs:** What type of vendor (venue, caterer, photographer, etc.)
-- **Questions:** 3-5 questions to ask each vendor type
-- **Status Pipeline:** not_started → contacted → quoted → booked/declined
-- **Validation:** Can't mark "booked" without vendor name
-
-### Ideas Feedback Loop
-
-- **Like/Dislike:** Toggle buttons with aria-pressed
-- **Save:** Bookmark ideas for later
-- **Regenerate:** Excludes disliked items, keeps saved ones
-- **Filters:** All/Saved/Liked views
-
-### Assistant Chat
-
-- **Context-aware:** Sees budget, tasks, vendors (not private notes)
-- **Streaming:** Word-by-word SSE responses
-- **Privacy:** Clear disclosure of what AI can see
-- **History:** Last 10 messages displayed
-
----
-
-## Documentation
-
-### For Users
-
-- `docs/prd.md` - Product requirements and features
-- `docs/scope.md` - What's in scope and out of scope
-
-### For Developers
-
-- `docs/architecture.md` - System architecture and design decisions
-- `docs/spec.md` - Technical specification (data models, APIs, testing)
-- `docs/plan.md` - Implementation plan and milestones
-- `CLAUDE.md` - Quick reference for AI-assisted development
-
-### For QA
-
-- `docs/checklist.md` - Build checklist and test plan
-- `scripts/README.md` - Testing scripts documentation
 
 ---
 
 ## Contributing
 
-### Code Style
+### Code Standards
 
-- **TypeScript:** Strict mode enabled
-- **Linting:** ESLint with complexity limits (max 10, max lines 300)
-- **Formatting:** Prettier
-- **Accessibility:** WCAG 2.1 AA compliance
-- **Testing:** ≥80% coverage globally, ≥95% for domain logic
+- **TypeScript strict mode** with ESLint (max complexity 10, max lines 300)
+- **Prettier** for formatting
+- **WCAG 2.1 AA** accessibility compliance
+- **≥80% test coverage** globally (≥95% for domain logic)
 
-### Commit Guidelines
+### Commit Convention
 
 ```bash
-# Before committing
-pnpm check:all  # Lint, typecheck, tests
-
-# Commit message format
 type(scope): description
 
 # Examples
 feat(budget): add expense tracking
-fix(timeline): correct date calculation
-docs(readme): update installation steps
+fix(timeline): correct timezone calculation
+docs(readme): simplify installation steps
 ```
 
 ### Pull Request Process
 
 1. Create feature branch from `main`
-2. Make changes with tests
-3. Run `pnpm check:all`
-4. Push branch and create PR
-5. CI must pass (all jobs green)
-6. Request review
-7. Merge when approved
+2. Implement changes with tests
+3. Run `pnpm check:all` (all checks must pass)
+4. Push and open PR
+5. Ensure CI passes
+6. Request review and merge when approved
 
 ---
 
@@ -649,10 +313,8 @@ Proprietary. All rights reserved.
 
 ## Support
 
-- **Documentation:** See `docs/` folder
-- **Issues:** Check existing issues or create new one
-- **Questions:** Refer to `CLAUDE.md` for quick answers
-
----
+**Documentation:** See `docs/` folder for detailed guides  
+**Issues:** Create an issue for bugs or feature requests  
+**Questions:** Check existing documentation or open a discussion
 
 **Built with ❤️ for event planners everywhere.**
